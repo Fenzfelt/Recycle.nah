@@ -1,0 +1,95 @@
+import discord, os, random, requests
+from discord.ext import commands
+from botlogic import pass_gen
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix='$', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
+
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f'Hi! I am a bot {bot.user}!')
+
+@bot.command()
+async def hehe(ctx, count_heh = 5):
+    await ctx.send("he" * count_heh)
+
+@bot.command()
+async def passgen(ctx):
+    await ctx.send('hi! berikut passwordmu: ')
+    await ctx.send(pass_gen(8))
+
+@bot.command()
+async def pangkatdua(ctx):
+    await ctx.send('hi!, masukkan sebuah angka (bebas) nanti tak pangkatin 2')
+    message = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.channel == ctx.channel)
+    await ctx.send(f'Ini hasilnya: {(int(message.content)**2)}')
+
+@bot.command()
+async def pangkattelu(ctx):
+    await ctx.send('hi!, masukkan sebuah angka (bebas) nanti tak pangkatin 3')
+    message3 = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.channel == ctx.channel)
+    await ctx.send(f'Ini hasilnya: {(int(message3.content)**3)}')
+
+@bot.command()
+async def pangkatpapat(ctx):
+    await ctx.send('hi!, masukkan sebuah angka (bebas) nanti tak pangkatin 4')
+    message4 = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.channel == ctx.channel)
+    await ctx.send(f'Ini hasilnya: {(int(message4.content)**4)}')
+
+@bot.command()
+async def pangkatlima(ctx):
+    await ctx.send('hi!, masukkan sebuah angka (bebas) nanti tak pangkatin 5')
+    message5 = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.channel == ctx.channel)
+    await ctx.send(f'Ini hasilnya: {(int(message5.content)**5)}')
+
+@bot.command()
+async def meme(ctx):
+    img_name = random.choice(os.listdir('images'))
+    with open(f'images/{img_name}', 'rb') as f:
+        picture = discord.File(f)
+    await ctx.send(file=picture)
+
+@bot.command()
+async def animal(ctx):
+    img_name = random.choice(os.listdir('animal'))
+    with open(f'animal/{img_name}', 'rb') as f:
+        picture = discord.File(f)
+    await ctx.send(file=picture)
+
+def get_duck_image_url():    
+    url = 'https://random-d.uk/api/random'
+    res = requests.get(url)
+    data = res.json()
+    return data['url']
+
+
+@bot.command('duck')
+async def duck(ctx):
+    '''Setelah kita memanggil perintah bebek (duck), program akan memanggil fungsi get_duck_image_url'''
+    image_url = get_duck_image_url()
+    await ctx.send(image_url)
+
+trash = ['botol plastik','sampah kaca','kertas','logam','karton','plastik','kardus','kaleng','majalah',
+         'tutup botol','botol kaca','koran',]
+
+@bot.command()
+async def ceksampah(ctx):
+    await ctx.send('Sampah apa yg mau anda cek?')
+    message = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.channel == ctx.channel)
+    message = str(message.content)
+
+    #Checking
+    if message.lower() in trash:
+        await ctx.send('sampah tersebut harus di daur ulang, berikut tips daur ulang')
+        await ctx.send('https://waste4change.com/blog/daur-ulang-sampah/')
+    else:
+        await ctx.send('sampah tersebut bisa dimusnahkan/dibuang dengan bijak')
+        await ctx.send('https://www.dbs.com/spark/index/id_id/site/articles/livemorekind/2022-jenis-sampah-dan-tempat-membuangnya.html')
+
+bot.run('WHITE NIGHT ma fav song :)')
